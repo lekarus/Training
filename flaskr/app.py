@@ -1,8 +1,5 @@
-from flask import Flask
+from database import app, models
 
-app = Flask(__name__)
-
-from db import db
 
 @app.route('/')
 def hello_world():
