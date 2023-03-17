@@ -1,4 +1,14 @@
-from . import db
+import enum
+
+from sqlalchemy.dialects.postgresql import ENUM
+
+from database import db
+
+
+class Roles(enum.Enum):
+    admin = "admin"
+    trainer = "trainer"
+    student = "student"
 
 
 SubUser = db.Table(
@@ -15,12 +25,17 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     first_name = db.Column(db.String(128))
     last_name = db.Column(db.String(128))
-    email = db.Column(db.String(128))
+    email = db.Column(db.String(128), unique=True)
     password = db.Column(db.String(128))
+    role = db.Column(ENUM(Roles, name="role_enum"), nullable=False,)
+
     subscriptions = db.orm.relationship("Subscription", secondary=SubUser, backref="users")
 
     def __str__(self):
         return f"i am {self.first_name} {self.last_name}"
+
+    def is_admin(self):
+        return self.role == Roles.admin
 
 
 class Sport(db.Model):
