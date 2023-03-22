@@ -20,4 +20,4 @@ Branch: $GITHUB_HEAD_REF
 
 URL="https://api.telegram.org/bot$TG_BOT_TOKEN/sendMessage"
 
-curl -s --max-time $TIME -d "chat_id=$TG_CHAT_ID&disable_web_page_preview=1&text=$TEXT&parse_mode=Markdown" "$URL"
+curl -s --max-time $TIME -d "chat_id=$TG_CHAT_ID&disable_web_page_preview=1&text=$TEXT&parse_mode=HTML" "$URL"
