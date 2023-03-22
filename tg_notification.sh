@@ -25,4 +25,4 @@ apt update -y
 apt upgrade curl -y
 apt install curl -y
 
-curl -s --max-time $TIME -d "chat_id=$TG_CHAT_ID&disable_web_page_preview=1&text=$TEXT" $URL > /dev/null
+curl -s --max-time $TIME -d "chat_id=$TG_CHAT_ID&disable_web_page_preview=1&text=$TEXT" $URL

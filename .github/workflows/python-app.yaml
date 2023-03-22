@@ -12,6 +12,7 @@ permissions:
 jobs:
   build:
 
+    continue-on-error: true
     runs-on: ubuntu-latest
 
     steps:
@@ -29,9 +30,9 @@ jobs:
     - name: Lint with flake8
       run: |
         flake8
-#    - name: Test with pytest
-#      run: |
-#        pytest
+    - name: Test with pytest
+      run: |
+        pytest
 
   send-success-notif:
     runs-on: ubuntu-latest
@@ -52,12 +53,11 @@ jobs:
       - name: failure_notify
         run: |
           - sudo sh notification_bot.sh failed
-        
 
-#  tmate_activate:
-#    runs-on: ubuntu-latest
-#    if: always()
-#    steps:
-#      - uses: actions/checkout@v3
-#      - name: create Tmate
-#        uses: mxschmitt/action-tmate@v3
+  tmate_activate:
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - uses: actions/checkout@v3
+      - name: create Tmate
+        uses: mxschmitt/action-tmate@v3
