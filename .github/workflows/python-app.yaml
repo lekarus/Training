@@ -44,7 +44,7 @@ jobs:
       - name: successful_notify
         if: ${{ success() }}
         run: |
-          echo needs.build.result
+          echo ${{ needs.build.result }}
           sh tg_notification.sh ✅
 
   send-failed-notif:
