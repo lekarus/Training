@@ -1,65 +1,50 @@
-from flask_restful import fields, marshal_with
+from marshmallow import fields
 
-from database.models import Subscription, User
-
-
-class Date(fields.Raw):
-    def format(self, value):
-        return value.strftime('%Y-%m-%d')
+from database.models import User, Subscription
+from serializers import ma
 
 
-user_serializer = {
-    "id": fields.Integer,
-    "first_name": fields.String,
-    "last_name": fields.String,
-    "email": fields.String
-}
+class UserSchema(ma.Schema):
+    class Meta:
+        fields = ("id", "first_name", "last_name", "email")
 
 
-class NestedUser(fields.Raw):
-    @marshal_with(user_serializer)
-    def format(self, value):
-        return User.query.filter_by(id=value).all()
+class SportSchema(ma.Schema):
+    class Meta:
+        fields = ("id", "sport")
 
 
-trainer_serializer = {
-    "id": fields.Integer,
-    "user": fields.Nested(user_serializer),
-    "sport": fields.String(attribute="sport.sport"),
-    "degree": fields.String,
-    "description": fields.String
-}
+class TrainerSchema(ma.Schema):
+    user = ma.Nested(UserSchema)
+    sport = ma.Nested(SportSchema)
 
-training_serializer = {
-    "id": fields.Integer,
-    "trainer": fields.Nested(trainer_serializer),
-    "description": fields.String
-}
-
-subscription_serializer = {
-    "id": fields.Integer,
-    "trainer": fields.Nested(trainer_serializer),
-    "sub_name": fields.String,
-    "cost": fields.Float,
-    "period": fields.Integer
-}
+    class Meta:
+        fields = ("id", "user", "sport", "degree", "description")
 
 
-class NestedSubscription(fields.Raw):
-    @marshal_with(subscription_serializer)
-    def format(self, value):
-        return Subscription.query.filter_by(id=value).all()
+class TrainingSchema(ma.Schema):
+    trainer = ma.Nested(TrainerSchema)
+
+    class Meta:
+        fields = ("id", "trainer", "description")
 
 
-sport_serializer = {
-    "id": fields.Integer,
-    "sport": fields.String
-}
+class SubscriptionSchema(ma.Schema):
+    trainer = ma.Nested(TrainerSchema)
 
-sub_user_serializer = {
-    "id": fields.Integer,
-    "user_id": NestedUser,
-    "subscription_id": NestedSubscription,
-    "from_date": Date,
-    "to_date": Date
-}
+    class Meta:
+        fields = ("id", "trainer", "sub_name", "cost", "period")
+
+
+class SubscriptionUserSchema(ma.Schema):
+    user = fields.Method("get_user")
+    subscription = fields.Method("get_subscription")
+
+    def get_user(self, obj):
+        return UserSchema().dump(User.query.filter_by(id=obj.user_id).first())
+
+    def get_subscription(self, obj):
+        return SubscriptionSchema().dump(Subscription.query.filter_by(id=obj.subscription_id).first())
+
+    class Meta:
+        fields = ("id", "user", "subscription", "from_date", "to_date")

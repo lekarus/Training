@@ -1,71 +1,230 @@
-from flask_restful import Resource, marshal_with
+from flask_restful import reqparse, Resource
+from werkzeug.http import http_date
+from werkzeug.security import generate_password_hash
 
-from database.models import User, Trainer, Sport, SubUser, Subscription, Training
-from serializers.crud import user_serializer, trainer_serializer, training_serializer, subscription_serializer, \
-    sport_serializer, sub_user_serializer
-from utils import create_blueprint_with_api, AdminResource
+from auth.auth import admin_required
+from database.models import User, Trainer, Sport, SubUser, Subscription, Training, Roles
+from serializers import crud_schemas
+from serializers import serializer_decorator
+from utils import create_blueprint_with_api, AdminResource, CRUDResource, CRUDRetrieveResource, mail
 
 crud, api = create_blueprint_with_api("crud", "crud")
 
 
-class UserCrud(AdminResource):
+class UserCrud(AdminResource, CRUDResource):
+    method_decorators = [admin_required(), serializer_decorator(crud_schemas.users_schema)]
+
     def __init__(self):
-        self.method_decorators.append(marshal_with(user_serializer))
+        self.table = User
 
-    def get(self):
-        return User.query.all()
+        super().__init__()
+
+    def load_parser(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('email', type=mail, location='json', required=True)
+        self.reqparse.add_argument('password', type=str, location='json', required=True)
+        self.reqparse.add_argument('first_name', type=str, location='json', required=True)
+        self.reqparse.add_argument('last_name', type=str, location='json', required=True)
+        self.reqparse.add_argument('role', type=Roles, choices=list(Roles), location='json', required=True)
+        self.reqparse.add_argument('password', type=str, location='json', required=True)
+        self.args = self.reqparse.parse_args()
+        self.args["password"] = generate_password_hash(self.args["password"])
 
 
-class TrainerCrud(Resource):
+class UserRetrieveCrud(AdminResource, CRUDRetrieveResource):
+    method_decorators = [admin_required(), serializer_decorator(crud_schemas.user_schema)]
+
     def __init__(self):
-        self.method_decorators.append(marshal_with(trainer_serializer))
+        self.table = User
 
-    def get(self):
-        return Trainer.query.all()
+        super().__init__()
+
+    def load_parser(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('email', type=mail, location='json', required=True)
+        self.reqparse.add_argument('password', type=str, location='json', required=True)
+        self.reqparse.add_argument('first_name', type=str, location='json', required=True)
+        self.reqparse.add_argument('last_name', type=str, location='json', required=True)
+        self.reqparse.add_argument('role', type=Roles, choices=list(Roles), location='json', required=True)
+        self.reqparse.add_argument('password', type=str, location='json', required=True)
+        self.args = self.reqparse.parse_args()
+        self.args["password"] = generate_password_hash(self.args["password"])
 
 
-class TrainingCrud(Resource):
+class TrainerCrud(AdminResource, CRUDResource):
+    method_decorators = [admin_required(), serializer_decorator(crud_schemas.trainers_schema)]
+
     def __init__(self):
-        self.method_decorators.append(marshal_with(training_serializer))
+        self.table = Trainer
 
-    @marshal_with(training_serializer)
-    def get(self):
-        return Training.query.all()
+        super().__init__()
+
+    def load_parser(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('user_id', type=int, location='json', required=True)
+        self.reqparse.add_argument('sport_id', type=int, location='json', required=True)
+        self.reqparse.add_argument('degree', type=str, location='json', required=True)
+        self.reqparse.add_argument('description', type=str, location='json', required=True)
+        self.args = self.reqparse.parse_args()
 
 
-class SubscriptionCrud(Resource):
+class TrainerCrudRetrieve(Resource, CRUDRetrieveResource):
+    method_decorators = [admin_required(), serializer_decorator(crud_schemas.trainer_schema)]
+
     def __init__(self):
-        self.method_decorators.append(marshal_with(subscription_serializer))
+        self.table = Trainer
 
-    def get(self):
-        return Subscription.query.all()
+        super().__init__()
+
+    def load_parser(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('user_id', type=int, location='json', required=True)
+        self.reqparse.add_argument('sport_id', type=int, location='json', required=True)
+        self.reqparse.add_argument('degree', type=str, location='json', required=True)
+        self.reqparse.add_argument('description', type=str, location='json', required=True)
+        self.args = self.reqparse.parse_args()
 
 
-class SportCrud(Resource):
+class TrainingCrud(AdminResource, CRUDResource):
+    method_decorators = [admin_required(), serializer_decorator(crud_schemas.trainings_schema)]
+
     def __init__(self):
-        self.method_decorators.append(marshal_with(sport_serializer))
+        self.table = Training
 
-    def get(self):
-        return Sport.query.all()
+        super().__init__()
+
+    def load_parser(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('trainer_id', type=int, location='json', required=True)
+        self.reqparse.add_argument('description', type=str, location='json', required=True)
+        self.args = self.reqparse.parse_args()
 
 
-class SubscriptionUserCrud(Resource):
+class TrainingCrudRetrieve(AdminResource, CRUDRetrieveResource):
+    method_decorators = [admin_required(), serializer_decorator(crud_schemas.training_schema)]
+
     def __init__(self):
-        self.method_decorators.append(marshal_with(sub_user_serializer))
+        self.table = Training
 
-    def get(self):
-        from sqlalchemy import create_engine
-        from sqlalchemy.orm import Session
-        from flask import current_app
+        super().__init__()
 
-        engine = create_engine(current_app.config["SQLALCHEMY_DATABASE_URI"])
-        with Session(engine) as session:
-            return session.query(SubUser).all()
+    def load_parser(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('trainer_id', type=int, location='json', required=True)
+        self.reqparse.add_argument('description', type=str, location='json', required=True)
+        self.args = self.reqparse.parse_args()
+
+
+class SubscriptionCrud(AdminResource, CRUDResource):
+    method_decorators = [admin_required(), serializer_decorator(crud_schemas.subscriptions_schema)]
+
+    def __init__(self):
+        self.table = Subscription
+
+        super().__init__()
+
+    def load_parser(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('trainer_id', type=int, location='json', required=True)
+        self.reqparse.add_argument('sub_name', type=str, location='json', required=True)
+        self.reqparse.add_argument('cost', type=float, location='json', required=True)
+        self.reqparse.add_argument('period', type=int, location='json', required=True)
+        self.args = self.reqparse.parse_args()
+
+
+class SubscriptionCrudRetrieve(AdminResource, CRUDRetrieveResource):
+    method_decorators = [admin_required(), serializer_decorator(crud_schemas.subscription_schema)]
+
+    def __init__(self):
+        self.table = Subscription
+
+        super().__init__()
+
+    def load_parser(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('trainer_id', type=int, location='json', required=True)
+        self.reqparse.add_argument('sub_name', type=str, location='json', required=True)
+        self.reqparse.add_argument('cost', type=float, location='json', required=True)
+        self.reqparse.add_argument('period', type=int, location='json', required=True)
+        self.args = self.reqparse.parse_args()
+
+
+class SportCrud(AdminResource, CRUDResource):
+    method_decorators = [admin_required(), serializer_decorator(crud_schemas.sports_schema)]
+
+    def __init__(self):
+        self.table = Sport
+
+        super().__init__()
+
+    def load_parser(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('sport', type=str, location='json', required=True)
+        self.args = self.reqparse.parse_args()
+
+
+class SportCrudRetrieve(AdminResource, CRUDRetrieveResource):
+    method_decorators = [admin_required(), serializer_decorator(crud_schemas.sport_schema)]
+
+    def __init__(self):
+        self.table = Sport
+
+        super().__init__()
+
+    def load_parser(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('sport', type=str, location='json', required=True)
+        self.args = self.reqparse.parse_args()
+
+
+class SubscriptionUserCrud(AdminResource, CRUDResource):
+    method_decorators = [admin_required(), serializer_decorator(crud_schemas.sub_users_schema)]
+
+    def __init__(self):
+        self.table = SubUser
+
+        super().__init__()
+
+    def load_parser(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('user_id', type=int, location='json', required=True)
+        self.reqparse.add_argument('subscription_id', type=int, location='json', required=True)
+        self.reqparse.add_argument('from_date', type=http_date, location='json', required=True)
+        self.reqparse.add_argument('to_date', type=http_date, location='json', required=True)
+        self.args = self.reqparse.parse_args()
+
+
+class SubscriptionUserCrudRetrieve(AdminResource, CRUDRetrieveResource):
+    method_decorators = [admin_required(), serializer_decorator(crud_schemas.sub_user_schema)]
+
+    def __init__(self):
+        self.table = SubUser
+
+        super().__init__()
+
+    def load_parser(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('user_id', type=int, location='json', required=True)
+        self.reqparse.add_argument('subscription_id', type=int, location='json', required=True)
+        self.reqparse.add_argument('from_date', type=http_date, location='json', required=True)
+        self.reqparse.add_argument('to_date', type=http_date, location='json', required=True)
+        self.args = self.reqparse.parse_args()
 
 
 api.add_resource(UserCrud, '/users')
+api.add_resource(UserRetrieveCrud, '/users/<int:instance_id>')
+
 api.add_resource(TrainerCrud, '/trainers')
+api.add_resource(TrainerCrudRetrieve, '/trainers/<int:instance_id>')
+
 api.add_resource(TrainingCrud, '/trainings')
+api.add_resource(TrainingCrudRetrieve, '/trainings/<int:instance_id>')
+
 api.add_resource(SubscriptionCrud, '/subscriptions')
-api.add_resource(SportCrud, '/sport')
-api.add_resource(SubscriptionUserCrud, '/sub_user')
+api.add_resource(SubscriptionCrudRetrieve, '/subscriptions/<int:instance_id>')
+
+api.add_resource(SportCrud, '/sports')
+api.add_resource(SportCrudRetrieve, '/sports/<int:instance_id>')
+
+api.add_resource(SubscriptionUserCrud, '/sub_users')
+api.add_resource(SubscriptionUserCrudRetrieve, '/sub_users/<int:instance_id>')

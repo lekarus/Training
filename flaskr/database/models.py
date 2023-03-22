@@ -27,9 +27,9 @@ class User(db.Model):
     last_name = db.Column(db.String(128))
     email = db.Column(db.String(128), unique=True)
     password = db.Column(db.String(128))
-    role = db.Column(ENUM(Roles, name="role_enum"), nullable=False,)
+    role = db.Column(ENUM(Roles, name="role_enum"), nullable=False, )
 
-    subscriptions = db.orm.relationship("Subscription", secondary=SubUser, backref="users")
+    subscriptions = db.orm.relationship("Subscription", secondary=SubUser, backref="users", lazy='subquery')
 
     def __str__(self):
         return f"i am {self.first_name} {self.last_name}"
@@ -50,8 +50,8 @@ class Trainer(db.Model):
     degree = db.Column(db.String(128))
     description = db.Column(db.String(128))
 
-    sport = db.orm.relationship("Sport", backref="trainers")
-    user = db.orm.relationship("User")
+    sport = db.orm.relationship("Sport", backref="trainers", lazy='subquery')
+    user = db.orm.relationship("User", lazy='subquery')
 
 
 class Training(db.Model):
@@ -59,7 +59,7 @@ class Training(db.Model):
     trainer_id = db.Column(db.ForeignKey("trainer.id"))
     description = db.Column(db.String(128))
 
-    trainer = db.orm.relationship("Trainer", backref="workouts")
+    trainer = db.orm.relationship("Trainer", backref="workouts", lazy='subquery')
 
 
 class Subscription(db.Model):
@@ -69,4 +69,4 @@ class Subscription(db.Model):
     cost = db.Column(db.Float(precision=2))
     period = db.Column(db.Integer)
 
-    trainer = db.orm.relationship("Trainer", backref="subscriptions")
+    trainer = db.orm.relationship("Trainer", backref="subscriptions", lazy='subquery')

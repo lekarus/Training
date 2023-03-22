@@ -11,6 +11,9 @@ flask-migrate = "*"
 python-dotenv = "*"
 flask-restful = "*"
 flask-jwt-extended = "*"
+pytest = "*"
+flask-marshmallow = "*"
+flake8 = "*"
 
 [dev-packages]
 

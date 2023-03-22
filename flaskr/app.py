@@ -1,11 +1,12 @@
-def create_app():
+def create_app(config="config.development"):
     from flask import Flask
 
     from auth.auth import jwt
     from database import db, migrate
+    from serializers import ma
 
     app = Flask(__name__)
-    app.config.from_object("config.development")
+    app.config.from_object(config)
 
     with app.app_context():
         register_blueprints(app)
@@ -13,6 +14,7 @@ def create_app():
         jwt.init_app(app)
         db.init_app(app)
         migrate.init_app(app, db)
+        ma.init_app(app)
 
         print(list(app.blueprints.keys()))
 

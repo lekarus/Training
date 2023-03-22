@@ -14,7 +14,6 @@ class Login(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('email', type=str, location='json', required=True)
         self.reqparse.add_argument('password', type=str, location='json', required=True)
-        self.reqparse.parse_args()
         super(Resource, self).__init__()
 
     def post(self):
@@ -23,7 +22,7 @@ class Login(Resource):
         if not user or not check_password_hash(user.password, args["password"]):
             return {"msg": "Bad username or password"}, 401
 
-        access_token = create_access_token(identity=user.id, additional_claims={"is_administrator": user.is_admin()})
+        access_token = create_access_token(identity=user.id)
         refresh_token = create_refresh_token(identity=user.id)
         return jsonify(access_token=access_token, refresh_token=refresh_token)
 
