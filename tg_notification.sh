@@ -4,21 +4,21 @@ TIME="10"
 
 if [ $1 == 'success' ]
 then
-  TEXT = "Deploy status: ✅%0A%0"
+  TEXT="Deploy status: ✅%0A%0"
 elif [ $1 == 'failed' ]
 then
-  TEXT = "Deploy status: ❌%0A%0
+  TEXT="Deploy status: ❌%0A%0
   Deploy failed in:%0A"
 fi
 
-TEXT = TEXT + "Action: $GITHUB_EVENT_NAME%0A
+TEXT=TEXT + "Action: $GITHUB_EVENT_NAME%0A
 Repository: $GITHUB_REPOSITORY%0A
 Actor: $GITHUB_ACTOR%0A
 Branch: $GITHUB_HEAD_REF%0A
 URL: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_REPOSITORY%0A
 "
 
-URL = "https://api.telegram.org/bot$TG_BOT_TOKEN/sendMessage"
+URL="https://api.telegram.org/bot$TG_BOT_TOKEN/sendMessage"
 
 apt update -y
 apt upgrade curl -y
