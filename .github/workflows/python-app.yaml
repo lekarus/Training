@@ -44,7 +44,8 @@ jobs:
       - name: successful_notify
         if: ${{ success() }}
         run: |
-          sh notification_bot.sh ✅
+          echo needs.build.result
+          sh tg_notification.sh ✅
 
   send-failed-notif:
     runs-on: ubuntu-latest
