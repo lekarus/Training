@@ -16,7 +16,6 @@ permissions:
 jobs:
   build:
 
-    continue-on-error: true
     runs-on: ubuntu-latest
 
     steps:
@@ -50,7 +49,7 @@ jobs:
           echo "${{ needs.build.result }}"
           echo "${{ needs.build.outcome }}"
           echo "${{ needs.build.result }}"
-          sudo sh tg_notification.sh success
+          bash tg_notification.sh success
 
   send-failed-notif:
     runs-on: ubuntu-latest
@@ -60,12 +59,16 @@ jobs:
       - uses: actions/checkout@v3
       - name: failure_notify
         run: |
-          - sudo sh notification_bot.sh failed
+          echo 'hello world!'
+          echo "${{ needs.build.result }}"
+          echo "${{ needs.build.outcome }}"
+          echo "${{ needs.build.result }}"
+          bash notification_bot.sh failed
 
-  tmate_activate:
-    runs-on: ubuntu-latest
-    if: always()
-    steps:
-      - uses: actions/checkout@v3
-      - name: create Tmate
-        uses: mxschmitt/action-tmate@v3
+#  tmate_activate:
+#    runs-on: ubuntu-latest
+#    if: always()
+#    steps:
+#      - uses: actions/checkout@v3
+#      - name: create Tmate
+#        uses: mxschmitt/action-tmate@v3
