@@ -4,15 +4,14 @@ TIME="10"
 
 if [[ "$1" == "success" ]]
 then
-  echo "im here"
   TEXT="Deploy status: ✅%0A%0A"
 elif [[ "$1" == "failed" ]]
 then
-  echo "im here"
-  TEXT="Deploy status: ❌%0A%0Deploy failed in:%0A"
+  TEXT="Deploy status: ❌%0A%0A"
 fi
 
-TEXT="${TEXT}Action: $GITHUB_EVENT_NAME
+TEXT="${TEXT}Deployment context:
+Action: $GITHUB_EVENT_NAME
 Repository: $GITHUB_REPOSITORY
 Actor: $GITHUB_ACTOR
 Branch: $GITHUB_HEAD_REF
