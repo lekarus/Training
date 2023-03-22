@@ -15,9 +15,9 @@ Action: $GITHUB_EVENT_NAME
 Repository: $GITHUB_REPOSITORY
 Actor: $GITHUB_ACTOR
 Branch: $GITHUB_HEAD_REF
-URL: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_REPOSITORY
+[URL]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_REPOSITORY)
 "
 
 URL="https://api.telegram.org/bot$TG_BOT_TOKEN/sendMessage"
 
-curl -s --max-time $TIME -d "chat_id=$TG_CHAT_ID&disable_web_page_preview=1&text=$TEXT" "$URL"
+curl -s --max-time $TIME -d "chat_id=$TG_CHAT_ID&disable_web_page_preview=1&text=$TEXT&parse_mode=MarkdownV2" "$URL"
