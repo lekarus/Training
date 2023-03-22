@@ -11,10 +11,10 @@ then
 fi
 
 TEXT="${TEXT}Deployment context:
-<code>Action</code>: <a href='$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/${GITHUB_REF#*/}'>$GITHUB_EVENT_NAME</a>
-<code>Repository</code>: <a href='$GITHUB_SERVER_URL/$GITHUB_REPOSITORY'>$GITHUB_REPOSITORY'</a>
-<code>Actor</code>: <a href='$GITHUB_SERVER_URL/$GITHUB_ACTOR'>$GITHUB_ACTOR</a>
-<code>Branch</code>: <a href='$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/tree/$GITHUB_HEAD_REF'>$GITHUB_HEAD_REF</a>
+<code>Action</code>:  <a href='$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/${GITHUB_REF#*/}'>$GITHUB_EVENT_NAME</a>
+<code>Repository</code>:  <a href='$GITHUB_SERVER_URL/$GITHUB_REPOSITORY'>$GITHUB_REPOSITORY'</a>
+<code>Actor</code>:  <a href='$GITHUB_SERVER_URL/$GITHUB_ACTOR'>$GITHUB_ACTOR</a>
+<code>Branch</code>:  <a href='$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/tree/$GITHUB_HEAD_REF'>$GITHUB_HEAD_REF</a>
 <a href='$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID'>Workflow URL</a>
 "
 
