@@ -1,9 +1,10 @@
+from database.models import SubUser, User
 from tests.utils import MainTestClass
 
 
 class TestUnAuthorizedAccess(MainTestClass):
     def test_unauthorized_401(self):
-        urls = ["users", "trainers", "trainings", "subscriptions", "sport", "sub_user"]
+        urls = ["users", "trainers", "trainings", "subscriptions", "sports", "sub_users"]
 
         for url in urls:
             get_response = self.client.get(f"/crud/{url}")
