@@ -25,7 +25,7 @@ jobs:
         python-version: "3.10"
     - name: Install dependencies
       run: |
-        ls &&
+        python -m pip install --upgrade pip &&
         python install pipenv && pipenv install --system
     - name: Lint with flake8
       run: |
