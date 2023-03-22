@@ -55,8 +55,6 @@ jobs:
       - name: Setup tmate session
         if: needs.build.result == "failure"
         uses: mxschmitt/action-tmate@v3
-        run: |
-          ls
 #        if: failure()
 #        script:
 #          - sh notification_bot.sh ❌
