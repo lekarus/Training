@@ -37,17 +37,20 @@ jobs:
   send-success-notif:
     runs-on: ubuntu-latest
     needs: build
-    if: needs.build.outcome == 'success'
+    if: needs.build.result == 'success'
     steps:
       - uses: actions/checkout@v3
       - name: successful_notify
         run: |
+          echo ${{ needs.build.result }}
+          echo ${{ needs.build.outcome }}
+          echo ${{ needs.build.result }}
           sudo sh tg_notification.sh success
 
   send-failed-notif:
     runs-on: ubuntu-latest
     needs: build
-    if: needs.build.outcome == 'failure'
+    if: needs.build.result == 'failure'
     steps:
       - uses: actions/checkout@v3
       - name: failure_notify

@@ -1,7 +1,6 @@
 #!/bin/bash
 
 TIME="10"
-URL="https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage"
 
 if [ $1 == 'success' ]
 then
