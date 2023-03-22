@@ -11,11 +11,11 @@ then
 fi
 
 TEXT="${TEXT}Deployment context:
-Action: $GITHUB_EVENT_NAME
-Repository: $GITHUB_REPOSITORY
-Actor: $GITHUB_ACTOR
-Branch: $GITHUB_HEAD_REF
-<a href='$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_REPOSITORY'>URL</a>
+<code>Action</code>: <a href='$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/${GITHUB_REF#*/}</a>
+<code>Repository</code>: <a href='$GITHUB_SERVER_URL/$GITHUB_REPOSITORY>$GITHUB_REPOSITORY</a>
+<code>Actor</code>: <a href='$GITHUB_SERVER_URL/$GITHUB_ACTOR'>$GITHUB_ACTOR</a>
+<code>Branch</code>: <a href='$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/tree/$GITHUB_HEAD_REF'>$GITHUB_HEAD_REF</a>
+<a href='$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID'>Workflow URL</a>
 "
 
 URL="https://api.telegram.org/bot$TG_BOT_TOKEN/sendMessage"
