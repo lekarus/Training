@@ -2,7 +2,7 @@ name: Python application
 
 on:
   push:
-    branches: [ "develop", "CI_CD_branch" ]
+    branches: [ "develop" ]
   pull_request:
     branches: [ "develop" ]
 
@@ -42,7 +42,7 @@ jobs:
     if: always()
     steps:
       - name: successful_notify
-        if: needs.build.result == success()
+        if: ${{ success() }}
         run: |
           sh notification_bot.sh ✅
 
@@ -52,7 +52,7 @@ jobs:
     if: always()
     steps:
       - name: Setup tmate session
-        if: needs.build.result == failure()
+        if: ${{ failure() }}
         uses: mxschmitt/action-tmate@v3
 #        if: failure()
 #        script:
