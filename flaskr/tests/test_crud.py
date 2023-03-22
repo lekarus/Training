@@ -1,4 +1,3 @@
-from database.models import SubUser, User
 from tests.utils import MainTestClass
 
 

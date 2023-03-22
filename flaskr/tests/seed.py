@@ -1,9 +1,7 @@
-import datetime
-
 from werkzeug.security import generate_password_hash
 
 from database import db
-from database.models import User, Sport, Trainer, SubUser, Training, Subscription
+from database.models import User, Sport, Trainer, Training, Subscription
 
 
 def seed_db():
@@ -38,7 +36,9 @@ def seed_db():
         if instance.role == 'student':
             instance.subscriptions.append(subscription_instance[0])
 
-    db.session.add_all(user_instances + sport_instances + training_instances + trainer_instances + subscription_instance)
+    db.session.add_all(
+        user_instances + sport_instances + training_instances + trainer_instances + subscription_instance
+    )
     db.session.commit()
 
 

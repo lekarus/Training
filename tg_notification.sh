@@ -18,8 +18,8 @@ else
 fi
 
 TEXT="${TEXT}Deployment context:
-$Action
-<b>Repository</b>:  <a href='$GITHUB_SERVER_URL/$GITHUB_REPOSITORY'>${$GITHUB_REPOSITORY#*/}</a>
+${Action}
+<b>Repository</b>:  <a href='$GITHUB_SERVER_URL/$GITHUB_REPOSITORY'>{$GITHUB_REPOSITORY#*/}</a>
 <b>Actor</b>:  <a href='$GITHUB_SERVER_URL/$GITHUB_ACTOR'>$GITHUB_ACTOR</a>
 <b>Branch</b>:  <a href='$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/tree/$GITHUB_HEAD_REF'>$GITHUB_HEAD_REF</a>
 <a href='$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID'>Workflow URL</a>
