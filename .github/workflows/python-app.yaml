@@ -42,7 +42,7 @@ jobs:
     if: always()
     steps:
       - name: successful_notify
-        if: jobs.build.success
+        if: needs.build.result == success()
         run: |
           sh notification_bot.sh ✅
 
@@ -52,7 +52,7 @@ jobs:
     if: always()
     steps:
       - name: Setup tmate session
-        if: jobs.build.failure
+        if: needs.build.result == failure()
         uses: mxschmitt/action-tmate@v3
 #        if: failure()
 #        script:
