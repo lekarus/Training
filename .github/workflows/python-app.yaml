@@ -32,33 +32,32 @@ jobs:
     - name: Test with pytest
       run: |
         pytest
-#    - name: Setup tmate session
-#      if: success() || failure()
-#      uses: mxschmitt/action-tmate@v3
 
   send-success-notif:
     runs-on: ubuntu-latest
     needs: build
-    if: always()
+    if:  ${{ needs.build.result == 'success' }}
     steps:
       - uses: actions/checkout@v3
       - name: successful_notify
-        if:  ${{ needs.build.result == 'success' }}
         run: |
-          ls
-          sh tg_notification.sh ✅
+          sudo sh tg_notification.sh success
 
   send-failed-notif:
     runs-on: ubuntu-latest
     needs: build
+    if: ${{ needs.build.result == 'failure' }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: failure_notify
+        run: |
+          - sudo sh notification_bot.sh failed
+        
+
+  tmate_activate:
+    runs-on: ubuntu-latest
     if: always()
     steps:
       - uses: actions/checkout@v3
-      - name: Setup tmate session
-        if: ${{ needs.build.result == 'failure' }}
+      - name: create Tmate
         uses: mxschmitt/action-tmate@v3
-#        if: failure()
-#        script:
-#          - sh notification_bot.sh ❌
-#      - name: failure_notify
-#        uses: actions/checkout@v3

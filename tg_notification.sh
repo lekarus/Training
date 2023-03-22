@@ -2,10 +2,26 @@
 
 TIME="10"
 URL="https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage"
-TEXT="Deploy status: $1%0A%0AProject:+$CI_PROJECT_NAME%0AURL:+$CI_PROJECT_URL/pipelines/$CI_PIPELINE_ID/%0ABranch:+$CI_COMMIT_REF_SLUG"
+
+if [ $1 == 'success' ]
+then
+  TEXT = "Deploy status: ✅%0A%0"
+elif [ $1 == 'failed' ]
+then
+  TEXT = "Deploy status: ❌%0A%0
+  Deploy failed in:%0A"
+fi
+
+TEXT = TEXT + "Repository: $GITHUB_REPOSITORY%0A
+Actor: $GITHUB_ACTOR%0A
+Branch: $GITHUB_HEAD_REF%0A
+URL: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_REPOSITORY%0A
+"
+
+URL = "https://api.telegram.org/bot$TG_BOT_TOKEN/sendMessage"
 
 apt update -y
 apt upgrade curl -y
 apt install curl -y
 
-curl -s --max-time $TIME -d "chat_id=$TELEGRAM_USER_ID&disable_web_page_preview=1&text=$TEXT" $URL > /dev/null
+curl -s --max-time $TIME -d "chat_id=$TG_CHAT_ID&disable_web_page_preview=1&text=$TEXT" $URL > /dev/null
