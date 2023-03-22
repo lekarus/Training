@@ -41,6 +41,7 @@ jobs:
     needs: build
     if: always()
     steps:
+      - uses: actions/checkout@v3
       - name: successful_notify
         if:  ${{ needs.build.result == 'success' }}
         run: |
@@ -52,6 +53,7 @@ jobs:
     needs: build
     if: always()
     steps:
+      - uses: actions/checkout@v3
       - name: Setup tmate session
         if: ${{ needs.build.result == 'failure' }}
         uses: mxschmitt/action-tmate@v3
