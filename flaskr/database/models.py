@@ -1,8 +1,7 @@
 import enum
 
-from sqlalchemy.dialects.postgresql import ENUM
-
 from database import db
+from sqlalchemy.dialects.postgresql import ENUM
 
 
 class Roles(enum.Enum):
@@ -17,7 +16,7 @@ SubUser = db.Table(
     db.Column("user_id", db.Integer, db.ForeignKey("user.id")),
     db.Column("subscription_id", db.Integer, db.ForeignKey("subscription.id")),
     db.Column('from_date', db.Date),
-    db.Column('to_date', db.Date)
+    db.Column('to_date', db.Date),
 )
 
 
@@ -27,7 +26,7 @@ class User(db.Model):
     last_name = db.Column(db.String(128))
     email = db.Column(db.String(128), unique=True)
     password = db.Column(db.String(128))
-    role = db.Column(ENUM(Roles, name="role_enum"), nullable=False, )
+    role = db.Column(ENUM(Roles, name="role_enum"), nullable=False)
 
     subscriptions = db.orm.relationship("Subscription", secondary=SubUser, backref="users", lazy='subquery')
 

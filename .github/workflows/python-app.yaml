@@ -9,6 +9,8 @@ on:
 env:
   TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
   TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+  FLASK_SECRET_KEY: ${{ secrets.FLASK_SECRET_KEY }}
+  JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
 
 permissions:
   contents: read
@@ -57,10 +59,10 @@ jobs:
         run: |
           bash tg_notification.sh failed
 
-#  tmate_activate:
-#    runs-on: ubuntu-latest
-#    if: always()
-#    steps:
-#      - uses: actions/checkout@v3
-#      - name: create Tmate
-#        uses: mxschmitt/action-tmate@v3
+  tmate_activate:
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - uses: actions/checkout@v3
+      - name: create Tmate
+        uses: mxschmitt/action-tmate@v3

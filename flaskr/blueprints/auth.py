@@ -1,10 +1,9 @@
-from flask_jwt_extended import create_access_token, create_refresh_token
-from flask import jsonify
-from flask_restful import Resource, reqparse
-from werkzeug.security import check_password_hash
-
 from database.models import User
+from flask import jsonify
+from flask_jwt_extended import create_access_token, create_refresh_token
+from flask_restful import reqparse, Resource
 from utils import create_blueprint_with_api
+from werkzeug.security import check_password_hash
 
 auth, api = create_blueprint_with_api("auth", url_prefix="auth")
 

@@ -1,12 +1,12 @@
+from auth.auth import admin_required
+from database.models import Roles, Sport, Subscription, SubUser, Trainer, Training, User
 from flask_restful import reqparse, Resource
+from serializers import crud_schemas
+from serializers import serializer_decorator
+from utils import AdminResource, create_blueprint_with_api, CRUDResource, CRUDRetrieveResource, mail
 from werkzeug.http import http_date
 from werkzeug.security import generate_password_hash
 
-from auth.auth import admin_required
-from database.models import User, Trainer, Sport, SubUser, Subscription, Training, Roles
-from serializers import crud_schemas
-from serializers import serializer_decorator
-from utils import create_blueprint_with_api, AdminResource, CRUDResource, CRUDRetrieveResource, mail
 
 crud, api = create_blueprint_with_api("crud", "crud")
 

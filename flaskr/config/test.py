@@ -1,4 +1,4 @@
-from config import development # noqa
+from config.development import *  # noqa
 
 TESTING = True
-SQLALCHEMY_DATABASE_URI = "sqlite:///"
+SQLALCHEMY_DATABASE_URI = "sqlite://"

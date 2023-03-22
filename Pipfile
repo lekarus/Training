@@ -14,6 +14,13 @@ flask-jwt-extended = "*"
 pytest = "*"
 flask-marshmallow = "*"
 flake8 = "*"
+flake8-print = "*"
+flake8-return = "*"
+flake8-literal = "*"
+flake8-commas = "*"
+flake8-import-order = "*"
+werkzeug = "*"
+sqlalchemy = "*"
 
 [dev-packages]
 

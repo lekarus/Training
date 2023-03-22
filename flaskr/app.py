@@ -16,7 +16,7 @@ def create_app(config="config.development"):
         migrate.init_app(app, db)
         ma.init_app(app)
 
-        print(list(app.blueprints.keys()))
+        print(list(app.blueprints.keys())) # noqa T201
 
     return app
 

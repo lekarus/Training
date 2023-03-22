@@ -1,12 +1,16 @@
+from database.models import Subscription, User
 from marshmallow import fields
-
-from database.models import User, Subscription
 from serializers import ma
 
 
 class UserSchema(ma.Schema):
+    role = fields.Method("get_role")
+
+    def get_role(self, value):
+        return value.role.value
+
     class Meta:
-        fields = ("id", "first_name", "last_name", "email")
+        fields = ("id", "first_name", "last_name", "email", "role")
 
 
 class SportSchema(ma.Schema):

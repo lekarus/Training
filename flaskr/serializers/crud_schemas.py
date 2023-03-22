@@ -1,5 +1,5 @@
-from serializers.crud import UserSchema, TrainerSchema, TrainingSchema, SubscriptionSchema, SportSchema, \
-    SubscriptionUserSchema
+from serializers.crud import SportSchema, SubscriptionSchema, SubscriptionUserSchema, TrainerSchema, TrainingSchema,\
+    UserSchema
 
 user_schema = UserSchema()
 users_schema = UserSchema(many=True)

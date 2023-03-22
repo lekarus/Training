@@ -1,9 +1,9 @@
 from functools import wraps
 
+from database.models import Roles, User
 from flask import abort
-from flask_jwt_extended import JWTManager, get_jwt, verify_jwt_in_request
+from flask_jwt_extended import get_jwt, JWTManager, verify_jwt_in_request
 
-from database.models import User, Roles
 
 jwt = JWTManager()
 
@@ -17,8 +17,7 @@ def admin_required():
             user = User.query.filter_by(id=claims["sub"]).first()
             if user.role == Roles.admin:
                 return fn(*args, **kwargs)
-            else:
-                return abort(403, description="Admins only!")
+            return abort(403, description="Admins only!")
 
         return decorator
 

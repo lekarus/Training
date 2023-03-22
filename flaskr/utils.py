@@ -1,15 +1,13 @@
 import re
 from typing import Type
 
-from flask import Blueprint
-from flask import current_app
-from flask_restful import Api, Resource, abort
-from flask_sqlalchemy.model import Model
-from sqlalchemy import create_engine
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
-
 from auth.auth import admin_required
+from database import db
+from flask import Blueprint
+from flask_restful import abort, Api, Resource
+from flask_sqlalchemy.model import Model
+from flask_sqlalchemy.session import Session
+from sqlalchemy.exc import IntegrityError
 
 
 def create_blueprint_with_api(print_name, url_prefix=None):
@@ -26,19 +24,15 @@ class ORMBaseClass:
     table: Type[Model]
     args: dict
 
-    def __init__(self):
-        self.engine = create_engine(current_app.config["SQLALCHEMY_DATABASE_URI"])
-        super().__init__()
-
     def make_select_query(self, **kwargs):
-        with Session(self.engine, expire_on_commit=False) as session:
+        with Session(db, expire_on_commit=False) as session:
             if not kwargs:
                 return session.query(self.table).all()
             return session.query(self.table).filter_by(**kwargs).all()
 
     def make_create_query(self):
         try:
-            with Session(self.engine, expire_on_commit=False) as session:
+            with Session(db, expire_on_commit=False) as session:
                 new_instance = self.table(**self.args)
                 session.add(new_instance)
                 session.commit()
@@ -49,7 +43,7 @@ class ORMBaseClass:
 
     def make_update_query(self, instance, new_params: dict):
         try:
-            with Session(self.engine, expire_on_commit=False) as session:
+            with Session(db, expire_on_commit=False) as session:
                 for param in new_params.items():
                     setattr(instance, param[0], param[1])
                 session.add(instance)
@@ -61,7 +55,7 @@ class ORMBaseClass:
 
     def make_delete_query(self, instance_id):
         try:
-            with Session(self.engine, expire_on_commit=False) as session:
+            with Session(db, expire_on_commit=False) as session:
                 deleted_objects = session.query(self.table).filter(self.table.id == instance_id).delete()
                 session.commit()
                 return deleted_objects
@@ -85,8 +79,7 @@ class CRUDRetrieveResource(ORMBaseClass):
         response = self.make_select_query(id=instance_id)
         if len(response) == 1:
             return response[0]
-        else:
-            abort(404, description=f"{self.table.__name__} not found")
+        abort(404, description=f"{self.table.__name__} not found")  # noqa: R503
 
     def put(self, instance_id):
         instance = self.make_select_query(id=instance_id)
@@ -105,5 +98,4 @@ class CRUDRetrieveResource(ORMBaseClass):
 def mail(value):
     if re.match(r"([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+", value):
         return value
-    else:
-        raise ValueError("wrong mail format")
+    raise ValueError("wrong mail format")
