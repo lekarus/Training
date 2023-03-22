@@ -15,7 +15,7 @@ Action: $GITHUB_EVENT_NAME
 Repository: $GITHUB_REPOSITORY
 Actor: $GITHUB_ACTOR
 Branch: $GITHUB_HEAD_REF
-[URL]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_REPOSITORY)
+<a href='$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_REPOSITORY'>URL</a>
 "
 
 URL="https://api.telegram.org/bot$TG_BOT_TOKEN/sendMessage"
