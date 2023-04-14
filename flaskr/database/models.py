@@ -69,3 +69,10 @@ class Subscription(db.Model):
     period = db.Column(db.Integer)
 
     trainer = db.orm.relationship("Trainer", backref="subscriptions", lazy='subquery')
+
+
+class NotifUser(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    from_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
+    to_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    is_read = db.Column(db.Boolean)

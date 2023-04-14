@@ -1,3 +1,7 @@
+from services.celery import celery_init_app
+# import services.tasks  # noqa F401
+
+
 def create_app(config="config.development"):
     from flask import Flask
 
@@ -15,8 +19,9 @@ def create_app(config="config.development"):
         db.init_app(app)
         migrate.init_app(app, db)
         ma.init_app(app)
-
-        print(list(app.blueprints.keys())) # noqa T201
+        app.config.from_prefixed_env()
+        celery_init_app(app)
+        print(list(app.blueprints.keys()))  # noqa T201
 
     return app
 
@@ -32,4 +37,4 @@ def register_blueprints(app):
 if __name__ == '__main__':
     flask_app = create_app()
     with flask_app.app_context():
-        flask_app.run()
+        flask_app.run(host="0.0.0.0")

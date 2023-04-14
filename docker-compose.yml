@@ -4,13 +4,51 @@ services:
 
   db:
     image: postgres
-    restart: always
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
         - db-data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+
+  redis:
+    image: redis
+
+  celery:
+    build: .
+    environment:
+      - DB_URI=db
+    volumes:
+      - ${PWD}:/app
+    command: celery -A services.tasks worker --beat --loglevel=debug -E
+    depends_on:
+      - redis
+
+  web:
+    build: .
+    restart: always
+    volumes:
+      - ${PWD}:/app
+    environment:
+      - DB_URI=db
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - celery
+      - db
+    ports:
+      - "5000:5000"
+
+  flower:
+    image: mher/flower
+    environment:
+      - DB_URI=db
+    volumes:
+      - ${PWD}:/app
+    ports:
+      - "5566:5566"
+    depends_on:
+      - web
+    command: celery --broker ${BROKER_URL} flower --address=0.0.0.0 --port=5566
 
 volumes:
   db-data:

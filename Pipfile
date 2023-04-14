@@ -21,6 +21,11 @@ flake8-commas = "*"
 flake8-import-order = "*"
 werkzeug = "*"
 sqlalchemy = "*"
+flask-celery = "*"
+redis = "*"
+google-auth-httplib2 = "*"
+google-auth-oauthlib = "*"
+google-api-python-client = "*"
 
 [dev-packages]
 

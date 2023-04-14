@@ -24,16 +24,20 @@ class ORMBaseClass:
     table: Type[Model]
     args: dict
 
+    def __init__(self, table=None):
+        if table is not None:
+            self.table = table
+
     def make_select_query(self, **kwargs):
         with Session(db, expire_on_commit=False) as session:
             if not kwargs:
                 return session.query(self.table).all()
             return session.query(self.table).filter_by(**kwargs).all()
 
-    def make_create_query(self):
+    def make_create_query(self, **kwargs):
         try:
             with Session(db, expire_on_commit=False) as session:
-                new_instance = self.table(**self.args)
+                new_instance = self.table(**kwargs)
                 session.add(new_instance)
                 session.commit()
                 return new_instance
@@ -70,7 +74,7 @@ class CRUDResource(ORMBaseClass):
 
     def post(self):
         self.load_parser()
-        return [self.make_create_query()], 201
+        return [self.make_create_query(**self.args)], 201
 
 
 class CRUDRetrieveResource(ORMBaseClass):
@@ -95,7 +99,7 @@ class CRUDRetrieveResource(ORMBaseClass):
         return f"{self.table.__name__} {instance_id} was deleted", 204
 
 
-def mail(value):
+def mail_checker(value):
     if re.match(r"([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+", value):
         return value
     raise ValueError("wrong mail format")

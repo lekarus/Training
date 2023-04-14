@@ -3,7 +3,7 @@ from database.models import Roles, Sport, Subscription, SubUser, Trainer, Traini
 from flask_restful import reqparse, Resource
 from serializers import crud_schemas
 from serializers import serializer_decorator
-from utils import AdminResource, create_blueprint_with_api, CRUDResource, CRUDRetrieveResource, mail
+from utils import AdminResource, create_blueprint_with_api, CRUDResource, CRUDRetrieveResource, mail_checker
 from werkzeug.http import http_date
 from werkzeug.security import generate_password_hash
 
@@ -21,7 +21,7 @@ class UserCrud(AdminResource, CRUDResource):
 
     def load_parser(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('email', type=mail, location='json', required=True)
+        self.reqparse.add_argument('email', type=mail_checker, location='json', required=True)
         self.reqparse.add_argument('password', type=str, location='json', required=True)
         self.reqparse.add_argument('first_name', type=str, location='json', required=True)
         self.reqparse.add_argument('last_name', type=str, location='json', required=True)
@@ -41,7 +41,7 @@ class UserRetrieveCrud(AdminResource, CRUDRetrieveResource):
 
     def load_parser(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('email', type=mail, location='json', required=True)
+        self.reqparse.add_argument('email', type=mail_checker, location='json', required=True)
         self.reqparse.add_argument('password', type=str, location='json', required=True)
         self.reqparse.add_argument('first_name', type=str, location='json', required=True)
         self.reqparse.add_argument('last_name', type=str, location='json', required=True)
@@ -68,7 +68,7 @@ class TrainerCrud(AdminResource, CRUDResource):
         self.args = self.reqparse.parse_args()
 
 
-class TrainerCrudRetrieve(Resource, CRUDRetrieveResource):
+class TrainerCrudRetrieve(AdminResource, CRUDRetrieveResource):
     method_decorators = [admin_required(), serializer_decorator(crud_schemas.trainer_schema)]
 
     def __init__(self):
@@ -211,6 +211,11 @@ class SubscriptionUserCrudRetrieve(AdminResource, CRUDRetrieveResource):
         self.args = self.reqparse.parse_args()
 
 
+class TestResource(Resource):
+    def get(self):
+        return "200"
+
+
 api.add_resource(UserCrud, '/users')
 api.add_resource(UserRetrieveCrud, '/users/<int:instance_id>')
 
@@ -228,3 +233,5 @@ api.add_resource(SportCrudRetrieve, '/sports/<int:instance_id>')
 
 api.add_resource(SubscriptionUserCrud, '/sub_users')
 api.add_resource(SubscriptionUserCrudRetrieve, '/sub_users/<int:instance_id>')
+
+api.add_resource(TestResource, '/test')
