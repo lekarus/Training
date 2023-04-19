@@ -28,9 +28,11 @@ def create_app(config="config.development"):
 def register_blueprints(app: Flask):
     from blueprints.crud import crud
     from blueprints.auth import auth
+    from blueprints.training import training
     from blueprints.notification import notification
 
     app.register_blueprint(crud)
+    app.register_blueprint(training)
     app.register_blueprint(auth)
     app.register_blueprint(notification)
 
