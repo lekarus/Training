@@ -29,9 +29,11 @@ def create_app(config="config.development"):
 def register_blueprints(app):
     from blueprints.crud import crud
     from blueprints.auth import auth
+    from blueprints.notification import notification
 
     app.register_blueprint(crud)
     app.register_blueprint(auth)
+    app.register_blueprint(notification)
 
 
 if __name__ == '__main__':

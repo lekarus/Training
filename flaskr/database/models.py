@@ -73,6 +73,11 @@ class Subscription(db.Model):
 
 class NotifUser(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    from_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
-    to_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    from_id = db.Column(db.ForeignKey("user.id"), nullable=True)
+    to_id = db.Column(db.ForeignKey("user.id"))
     is_read = db.Column(db.Boolean)
+    notif_header = db.Column(db.String(64))
+    notif_body = db.Column(db.Text)
+
+    def read(self):
+        self.is_read = True

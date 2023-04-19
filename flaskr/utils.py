@@ -11,7 +11,7 @@ from sqlalchemy.exc import IntegrityError
 
 
 def create_blueprint_with_api(print_name, url_prefix=None):
-    blueprint = Blueprint(print_name, __name__, url_prefix="/" + url_prefix)
+    blueprint = Blueprint(print_name, __name__, url_prefix=("/" + url_prefix) if url_prefix else None)
     api = Api(blueprint)
     return blueprint, api
 
