@@ -35,12 +35,16 @@ class User(db.Model):
     role = db.Column(ENUM(Roles, name="role_enum"), nullable=False)
 
     subscriptions = db.relationship("Subscription", secondary=SubUser, backref="users", lazy='subquery')
+    trainer = db.orm.relationship("Trainer", lazy='subquery', uselist=False)
 
     def __str__(self):
         return f"i am {self.first_name} {self.last_name}"
 
     def is_admin(self):
         return self.role == Roles.admin
+
+    def is_trainer(self):
+        return self.role == Roles.trainer
 
 
 class Sport(db.Model):
@@ -59,14 +63,6 @@ class Trainer(db.Model):
     user = db.orm.relationship("User", lazy='subquery')
 
 
-class Training(db.Model):
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    trainer_id = db.Column(db.ForeignKey("trainer.id"))
-    description = db.Column(db.String(128))
-
-    trainer = db.orm.relationship("Trainer", backref="workouts", lazy='subquery')
-
-
 class Subscription(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     trainer_id = db.Column(db.ForeignKey("trainer.id"))
@@ -75,6 +71,25 @@ class Subscription(db.Model):
     period = db.Column(db.Integer)
 
     trainer = db.orm.relationship("Trainer", backref="subscriptions", lazy='subquery')
+
+
+class DailyTraining(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    subscription_id = db.Column(db.ForeignKey("subscription.id"))
+    description = db.Column(db.String(128))
+    rank = db.Column(db.Integer, autoincrement=True)
+
+    subscription = db.orm.relationship("Subscription", backref="days", lazy='subquery')
+
+
+class Training(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    daily_training_id = db.Column(db.ForeignKey("daily_training.id"))
+    description = db.Column(db.String(128))
+    from_time = db.Column(db.Time)
+    to_time = db.Column(db.Time)
+
+    daily_training = db.orm.relationship("DailyTraining", backref="trainings", lazy='subquery')
 
 
 class Notification(db.Model):
