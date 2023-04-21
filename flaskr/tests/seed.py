@@ -1,9 +1,13 @@
+from typing import List, Type
+
 from database import db
 from database.models import Sport, Subscription, Trainer, Training, User
+from flask_sqlalchemy.model import Model
 from werkzeug.security import generate_password_hash
 
 
 def seed_db():
+    """method for seed all tables in DB"""
     user_data = [
         {"id": 1, "first_name": "test admin", "last_name": "last_name name", "email": "admin@example.com",
          "role": "admin", "password": generate_password_hash("admin")},
@@ -14,7 +18,7 @@ def seed_db():
     ]
     user_instances = seed_table(User, user_data)
     sport_data = [
-        {"id": 1, "sport": "test sport"},
+        {"id": 1, "name": "test sport"},
     ]
     sport_instances = seed_table(Sport, sport_data)
     trainer_data = [
@@ -22,7 +26,7 @@ def seed_db():
     ]
     trainer_instances = seed_table(Trainer, trainer_data)
     subscription_data = [
-        {"id": 1, "trainer_id": 1, "sub_name": "test subscription name", "cost": 38, "period": 7},
+        {"id": 1, "trainer_id": 1, "name": "test subscription name", "cost": 38, "period": 7},
     ]
     subscription_instance = seed_table(Subscription, subscription_data)
     training_data = [
@@ -41,7 +45,8 @@ def seed_db():
     db.session.commit()
 
 
-def seed_table(table, data):
+def seed_table(table: Type[Model], data: List[dict]) -> List[Model]:
+    """method for seed one table"""
     instances = list()
     for instance in data:
         instances.append(table(**instance))

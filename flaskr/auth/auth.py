@@ -9,6 +9,8 @@ jwt = JWTManager()
 
 
 def admin_required():
+    """decorator for admin access"""
+
     def wrapper(fn):
         @wraps(fn)
         def decorator(*args, **kwargs):

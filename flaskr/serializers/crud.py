@@ -15,7 +15,7 @@ class UserSchema(ma.Schema):
 
 class SportSchema(ma.Schema):
     class Meta:
-        fields = ("id", "sport")
+        fields = ("id", "name")
 
 
 class TrainerSchema(ma.Schema):
@@ -37,7 +37,7 @@ class SubscriptionSchema(ma.Schema):
     trainer = ma.Nested(TrainerSchema)
 
     class Meta:
-        fields = ("id", "trainer", "sub_name", "cost", "period")
+        fields = ("id", "trainer", "name", "cost", "period")
 
 
 class SubscriptionUserSchema(ma.Schema):
