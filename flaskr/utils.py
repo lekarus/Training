@@ -62,7 +62,7 @@ class ORMBaseClass:
     def make_delete_query(self, instance_id: int):
         try:
             with Session(db, expire_on_commit=False) as session:
-                deleted_objects = session.query(self.table).get(instance_id).delete()
+                deleted_objects = session.query(self.table).filter_by(id=instance_id).delete()
                 session.commit()
                 return deleted_objects
         except IntegrityError as ex:
