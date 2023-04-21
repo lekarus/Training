@@ -2,7 +2,8 @@ from unittest import TestCase
 
 from app import create_app
 from database import db
-from database.models import User
+from database.models import Roles, User
+from flask_sqlalchemy.model import Model
 from flask_sqlalchemy.session import Session
 from tests.seed import seed_db
 from werkzeug.security import generate_password_hash
@@ -12,6 +13,7 @@ class MainTestClass(TestCase):
     token = ""
 
     def setUp(self):
+        """set up test class"""
         self.app = create_app("config.test")
         self.client = self.app.test_client()
         with self.app.app_context():
@@ -23,13 +25,15 @@ class MainTestClass(TestCase):
             db.session.remove()
             db.drop_all()
 
-    def create_instance(self, instance):
+    def create_instance(self, instance: Model):
+        """create instance in DB"""
         with self.app.app_context():
             with Session(db, expire_on_commit=False) as session:
                 session.add(instance)
                 session.commit()
 
-    def login_by(self, role):
+    def login_by(self, role: Roles):
+        """login by one of the User role"""
         password = "test password"
         user = User(role=role, password=generate_password_hash(password), email="new_test_mail@example.com")
         self.create_instance(user)

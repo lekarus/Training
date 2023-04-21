@@ -36,7 +36,7 @@ class NotificationResource(Resource):
         return 200
 
     @staticmethod
-    def _send_notif_to_all(from_user, args):
+    def _send_notif_to_all(from_user: User, args: dict):
         """send notification to all users in system"""
 
         from services.tasks import send_notification
@@ -47,7 +47,7 @@ class NotificationResource(Resource):
         send_notification.delay(from_user, users, args["notif_header"], args["notif_body"])
 
     @staticmethod
-    def _send_notif_direct(from_user, args):
+    def _send_notif_direct(from_user: User, args: dict):
         """send direct notification"""
 
         from services.tasks import send_notification

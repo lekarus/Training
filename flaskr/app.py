@@ -1,9 +1,8 @@
+from flask import Flask
 from services.celery import celery_init_app
-# import services.tasks  # noqa F401
 
 
 def create_app(config="config.development"):
-    from flask import Flask
 
     from auth.auth import jwt
     from database import db, migrate
@@ -26,7 +25,7 @@ def create_app(config="config.development"):
     return app
 
 
-def register_blueprints(app):
+def register_blueprints(app: Flask):
     from blueprints.crud import crud
     from blueprints.auth import auth
     from blueprints.notification import notification

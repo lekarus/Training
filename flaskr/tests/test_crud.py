@@ -1,3 +1,5 @@
+from flask_sqlalchemy.model import Model
+
 from database.models import Roles, User
 from tests.utils import MainTestClass
 from werkzeug.security import check_password_hash
@@ -6,7 +8,8 @@ from werkzeug.security import check_password_hash
 class TestCRUD(MainTestClass):
     urls = ["users", "trainers", "trainings", "subscriptions", "sports", "sub_users"]
 
-    def assert_equal_instance_to_dict(self, instance, data: dict):
+    def assert_equal_instance_to_dict(self, instance: Model, data: dict):
+        """method to check db.Model instance and dict for equals"""
         for item in data.items():
             self.assertEqual(getattr(instance, item[0]), item[1])
 

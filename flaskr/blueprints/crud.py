@@ -213,6 +213,8 @@ class SubscriptionUserCrudRetrieve(AdminResource, CRUDRetrieveResource):
 
 class TestResource(Resource):
     def get(self):
+        from services.tasks import subscription_expiration_check
+        subscription_expiration_check.delay()
         return "200"
 
 
