@@ -1,3 +1,4 @@
+import datetime
 from datetime import date, timedelta
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -6,7 +7,7 @@ import smtplib
 
 from app import create_app
 from database import db
-from database.models import NotifUser, SubUser, User
+from database.models import Notification, SubUser, User
 from dotenv import load_dotenv
 from flask_sqlalchemy.session import Session
 from utils import ORMBaseClass
@@ -19,6 +20,8 @@ celery_app = flask_app.extensions["celery"]
 
 @celery_app.task
 def send_notification(sender_id: str, sender_email: str, receivers: list, topic: str, body_text: str):
+    """create record in DB and send email notifications"""
+
     message = MIMEMultipart("alternative")
     message["Subject"] = topic
     message["From"] = sender_email
@@ -28,22 +31,24 @@ def send_notification(sender_id: str, sender_email: str, receivers: list, topic:
     if len(receivers) > 1:
         with Session(db) as session:
             notifications = [
-                NotifUser(
+                Notification(
                     from_id=sender_id,
                     to_id=receiver["id"],
                     is_read=False,
                     notif_header=topic,
                     notif_body=body_text,
+                    send_at=datetime.datetime.now(),
                 )
                 for receiver in receivers
             ]
             session.bulk_save_objects(notifications)
             session.commit()
     else:
-        ORMBaseClass(table=NotifUser).make_create_query(
+        ORMBaseClass(table=Notification).make_create_query(
             from_id=sender_id,
             to_id=receivers[0]["id"],
             is_read=False,
+            send_at=datetime.datetime.now(),
         )
 
     with smtplib.SMTP("smtp.pacomail.io", 2525) as server:

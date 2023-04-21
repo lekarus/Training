@@ -10,6 +10,12 @@ class Roles(enum.Enum):
     student = "student"
 
 
+class NotificationType(enum.Enum):
+    to_all = "to_all"
+    direct = "direct"
+    subscription = "subscription"
+
+
 SubUser = db.Table(
     'sub_user',
     db.Column('id', db.Integer, primary_key=True, autoincrement=True),
@@ -28,7 +34,7 @@ class User(db.Model):
     password = db.Column(db.String(128))
     role = db.Column(ENUM(Roles, name="role_enum"), nullable=False)
 
-    subscriptions = db.orm.relationship("Subscription", secondary=SubUser, backref="users", lazy='subquery')
+    subscriptions = db.relationship("Subscription", secondary=SubUser, backref="users", lazy='subquery')
 
     def __str__(self):
         return f"i am {self.first_name} {self.last_name}"
@@ -39,7 +45,7 @@ class User(db.Model):
 
 class Sport(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    sport = db.Column(db.String(128))
+    name = db.Column(db.String(128))
 
 
 class Trainer(db.Model):
@@ -64,20 +70,18 @@ class Training(db.Model):
 class Subscription(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     trainer_id = db.Column(db.ForeignKey("trainer.id"))
-    sub_name = db.Column(db.String(128))
+    name = db.Column(db.String(128))
     cost = db.Column(db.Float(precision=2))
     period = db.Column(db.Integer)
 
     trainer = db.orm.relationship("Trainer", backref="subscriptions", lazy='subquery')
 
 
-class NotifUser(db.Model):
+class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     from_id = db.Column(db.ForeignKey("user.id"), nullable=True)
     to_id = db.Column(db.ForeignKey("user.id"))
     is_read = db.Column(db.Boolean)
-    notif_header = db.Column(db.String(64))
-    notif_body = db.Column(db.Text)
-
-    def read(self):
-        self.is_read = True
+    header = db.Column(db.String(64))
+    body = db.Column(db.Text)
+    send_at = db.Column(db.DateTime)
