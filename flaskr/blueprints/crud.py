@@ -126,7 +126,7 @@ class SubscriptionCrud(AdminResource, CRUDResource):
     def load_parser(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('trainer_id', type=int, location='json', required=True)
-        self.reqparse.add_argument('sub_name', type=str, location='json', required=True)
+        self.reqparse.add_argument('name', type=str, location='json', required=True)
         self.reqparse.add_argument('cost', type=float, location='json', required=True)
         self.reqparse.add_argument('period', type=int, location='json', required=True)
         self.args = self.reqparse.parse_args()
@@ -143,7 +143,7 @@ class SubscriptionCrudRetrieve(AdminResource, CRUDRetrieveResource):
     def load_parser(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('trainer_id', type=int, location='json', required=True)
-        self.reqparse.add_argument('sub_name', type=str, location='json', required=True)
+        self.reqparse.add_argument('name', type=str, location='json', required=True)
         self.reqparse.add_argument('cost', type=float, location='json', required=True)
         self.reqparse.add_argument('period', type=int, location='json', required=True)
         self.args = self.reqparse.parse_args()
@@ -159,7 +159,7 @@ class SportCrud(AdminResource, CRUDResource):
 
     def load_parser(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('sport', type=str, location='json', required=True)
+        self.reqparse.add_argument('name', type=str, location='json', required=True)
         self.args = self.reqparse.parse_args()
 
 
@@ -173,7 +173,7 @@ class SportCrudRetrieve(AdminResource, CRUDRetrieveResource):
 
     def load_parser(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('sport', type=str, location='json', required=True)
+        self.reqparse.add_argument('name', type=str, location='json', required=True)
         self.args = self.reqparse.parse_args()
 
 

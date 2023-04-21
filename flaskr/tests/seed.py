@@ -14,7 +14,7 @@ def seed_db():
     ]
     user_instances = seed_table(User, user_data)
     sport_data = [
-        {"id": 1, "sport": "test sport"},
+        {"id": 1, "name": "test sport"},
     ]
     sport_instances = seed_table(Sport, sport_data)
     trainer_data = [
@@ -22,7 +22,7 @@ def seed_db():
     ]
     trainer_instances = seed_table(Trainer, trainer_data)
     subscription_data = [
-        {"id": 1, "trainer_id": 1, "sub_name": "test subscription name", "cost": 38, "period": 7},
+        {"id": 1, "trainer_id": 1, "name": "test subscription name", "cost": 38, "period": 7},
     ]
     subscription_instance = seed_table(Subscription, subscription_data)
     training_data = [
