@@ -1,5 +1,5 @@
 import re
-from typing import Tuple, Type, List
+from typing import List, Tuple, Type
 
 from auth.auth import admin_required
 from database import db

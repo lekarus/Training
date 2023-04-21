@@ -1,6 +1,5 @@
-from flask_sqlalchemy.model import Model
-
 from database.models import Roles, User
+from flask_sqlalchemy.model import Model
 from tests.utils import MainTestClass
 from werkzeug.security import check_password_hash
 
