@@ -27,10 +27,9 @@ class TrainerSchema(ma.Schema):
 
 
 class TrainingSchema(ma.Schema):
-    trainer = ma.Nested(TrainerSchema)
 
     class Meta:
-        fields = ("id", "trainer", "description")
+        fields = ("id", "daily_training_id", "description", "from_time", "to_time")
 
 
 class SubscriptionSchema(ma.Schema):

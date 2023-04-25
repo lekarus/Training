@@ -1,7 +1,7 @@
 from typing import List, Type
 
 from database import db
-from database.models import Sport, Subscription, Trainer, Training, User
+from database.models import DailyTraining, Sport, Subscription, Trainer, Training, User
 from flask_sqlalchemy.model import Model
 from werkzeug.security import generate_password_hash
 
@@ -29,8 +29,13 @@ def seed_db():
         {"id": 1, "trainer_id": 1, "name": "test subscription name", "cost": 38, "period": 7},
     ]
     subscription_instance = seed_table(Subscription, subscription_data)
+    daily_training_data = [
+        {"id": 1, "subscription_id": 1, "description": "test description", "rank": 0},
+    ]
+    daily_training_instances = seed_table(DailyTraining, daily_training_data)
+
     training_data = [
-        {"id": 1, "trainer_id": 1, "description": "test description"},
+        {"id": 1, "daily_training_id": 1, "description": "test description"},
     ]
     training_instances = seed_table(Training, training_data)
 
@@ -40,7 +45,7 @@ def seed_db():
             instance.subscriptions.append(subscription_instance[0])
 
     db.session.add_all(
-        user_instances + sport_instances + training_instances + trainer_instances + subscription_instance,
+        user_instances + sport_instances + training_instances + trainer_instances + subscription_instance + daily_training_instances  # noqa 501
     )
     db.session.commit()
 
