@@ -1,5 +1,6 @@
 from flask import Flask
 from services.celery import celery_init_app
+import stripe
 
 
 def create_app(config="config.development"):
@@ -10,6 +11,7 @@ def create_app(config="config.development"):
 
     app = Flask(__name__)
     app.config.from_object(config)
+    stripe.api_key = app.config["STRIPE_API_KEY"]
 
     with app.app_context():
         register_blueprints(app)

@@ -1,12 +1,14 @@
 from datetime import date
 
 from database import db
-from database.models import DailyTraining, Subscription, SubUser, Training, User
+from database.models import DailyTraining, PaymentStatus, Subscription, SubUser, Training, User
 from flask import request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_restful import abort, Resource
 from flask_sqlalchemy.session import Session
-from serializers.subscriptions import SubscriptionSchema, SubscriptionValidator
+from serializers.subscriptions import SubscriptionSchema, SubscriptionValidator, SubscriptionWithLinkSchema, \
+    UserSubscribeValidator
+import stripe
 from utils import create_blueprint_with_api
 
 subscriptions, api = create_blueprint_with_api("subscriptions", "subscriptions")
@@ -42,11 +44,37 @@ class SubscriptionsView(Resource):
 
     def _create_subscription(self, json: dict, user: User, session) -> Subscription:
         """create subscription instance"""
+        # create product on Stripe side
+        product = stripe.Product.create(name=json["name"])
+        cost_for_stripe = int(round(json["cost"], 2) * 100)
+        price = stripe.Price.create(
+            product=product["id"],
+            unit_amount=cost_for_stripe,
+            currency="uah",
+            recurring={
+                "interval": "day",
+                "interval_count": json["period"],
+            },
+        )
+        payment_link = stripe.PaymentLink.create(
+            line_items=[
+                {
+                    "price": price["id"],
+                    "quantity": 1,
+                },
+            ],
+        )
+        # price["id"] -> determine price by id
+        # price["product"] -> determine product by id
+        # payment_link["url"] -> url for payment
+
         subscription = Subscription(
             trainer_id=user.trainer.id,
             name=json["name"],
             cost=json["cost"],
             period=json["period"],
+            api_key=price["id"],
+            link=payment_link["url"],
         )
         session.add(subscription)
         session.commit()
@@ -71,6 +99,8 @@ class SubscriptionsView(Resource):
                         errors["days"][daily_counter] = {"trainings": dict()}
                     # creating a skeleton for the dictionary so that there are no KeyErrors
                     errors["days"][daily_counter]["trainings"][counter] = "from_time must be after to_time"
+        if not errors["days"]:
+            errors = None
         return errors
 
     @jwt_required()
@@ -122,6 +152,33 @@ class CheckFutureSubscriptions(Resource):
             return SubscriptionSchema(many=True).dump(subscriptions)
 
 
+class SubscribeView(Resource):
+    @jwt_required()
+    def post(self, id):
+        errors = UserSubscribeValidator().validate(request.json)
+        if errors:
+            return errors
+
+        with Session(db) as session:
+            insert_stmnt = SubUser.insert().values(
+                user_id=get_jwt_identity(),
+                subscription_id=id,
+                from_date=request.json["from_date"],
+                to_date=request.json["to_date"],
+                payment_status=PaymentStatus.pending,
+            )
+            session.execute(insert_stmnt)
+            session.commit()
+
+        return SubscriptionWithLinkSchema().dump(Subscription.query.get(id))
+
+    @jwt_required()
+    def get(self, id):
+        sub = Subscription.query.get(id)
+        return SubscriptionSchema().dump(sub)
+
+
 api.add_resource(SubscriptionsView, '/')
 api.add_resource(CheckActiveSubscriptions, '/active')
 api.add_resource(CheckFutureSubscriptions, '/future')
+api.add_resource(SubscribeView, '/subscribe/<int:id>')
