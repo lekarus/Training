@@ -16,13 +16,20 @@ class NotificationType(enum.Enum):
     subscription = "subscription"
 
 
+class PaymentStatus(enum.Enum):
+    pending = "pending"
+    successfully = "successfully"
+    failure = "failure"
+
+
 SubUser = db.Table(
-    'sub_user',
-    db.Column('id', db.Integer, primary_key=True, autoincrement=True),
+    "sub_user",
+    db.Column("id", db.Integer, primary_key=True, autoincrement=True),
     db.Column("user_id", db.Integer, db.ForeignKey("user.id")),
     db.Column("subscription_id", db.Integer, db.ForeignKey("subscription.id")),
-    db.Column('from_date', db.Date),
-    db.Column('to_date', db.Date),
+    db.Column("from_date", db.Date),
+    db.Column("to_date", db.Date),
+    db.Column("payment_status", ENUM(PaymentStatus, name="payment_status_enum")),
 )
 
 
@@ -69,6 +76,8 @@ class Subscription(db.Model):
     name = db.Column(db.String(128))
     cost = db.Column(db.Float(precision=2))
     period = db.Column(db.Integer)
+    api_key = db.Column(db.String(128))
+    link = db.Column(db.String(128))
 
     trainer = db.orm.relationship("Trainer", backref="subscriptions", lazy='subquery')
 

@@ -24,3 +24,5 @@ CELERY = {
         },
     },
 }
+
+STRIPE_API_KEY = os.getenv("STRIPE_API_KEY")
