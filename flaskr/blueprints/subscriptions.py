@@ -5,6 +5,7 @@ from database.models import DailyTraining, PaymentStatus, Subscription, SubUser,
 from flask import request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_restful import abort, Resource
+from flask_restful_swagger import swagger
 from flask_sqlalchemy.session import Session
 from serializers.subscriptions import SubscriptionSchema, SubscriptionValidator, SubscriptionWithLinkSchema, \
     UserSubscribeValidator
@@ -100,10 +101,76 @@ class SubscriptionsView(Resource):
             errors = None
         return errors
 
+    @swagger.operation(
+        notes='Get all subscriptions',
+
+        responseMessages=[
+            {
+                "code": 200,
+                "message": "[List of subscriptions]",
+            },
+            {
+                "code": 401,
+                "message": "Missing Authorization Header",
+            },
+        ],
+    )
     @jwt_required()
     def get(self):
         return SubscriptionSchema(many=True).dump(Subscription.query.all())
 
+    @swagger.operation(
+        notes='Create new subscription',
+        parameters=[
+            {
+                "name": "name",
+                "description": "subscription name",
+                "required": True,
+                "allowMultiple": False,
+                "dataType": str.__name__,
+                "paramType": "body",
+            }, {
+                "name": "cost",
+                "description": "subscription cost in UAH",
+                "required": True,
+                "allowMultiple": False,
+                "dataType": float.__name__,
+                "paramType": "body",
+            }, {
+                "name": "period",
+                "description": "subscription duration",
+                "required": True,
+                "allowMultiple": False,
+                "dataType": int.__name__,
+                "paramType": "body",
+            }, {
+                "name": "days",
+                "description": "a description of each day the subscription is valid",
+                "required": True,
+                "allowMultiple": True,
+                "dataType": list.__name__,
+                "paramType": "body",
+            },
+        ],
+        responseMessages=[
+            {
+                "code": 201,
+                "message": "[Subscription]",
+            },
+            {
+                "code": 401,
+                "message": "Missing Authorization Header",
+            },
+            {
+                "code": 403,
+                "message": "Access only for coaches",
+            },
+            {
+                "code": 400,
+                "message": "[Errors]",
+            },
+        ],
+    )
     @jwt_required()
     def post(self):
         current_user = User.query.get(get_jwt_identity())
@@ -120,6 +187,20 @@ class SubscriptionsView(Resource):
 
 class CheckActiveSubscriptions(Resource):
     """active subscriptions"""
+
+    @swagger.operation(
+        notes='Get your active subscriptions',
+        responseMessages=[
+            {
+                "code": 200,
+                "message": "[List of subscriptions]",
+            },
+            {
+                "code": 401,
+                "message": "Missing Authorization Header",
+            },
+        ],
+    )
     @jwt_required()
     def get(self):
         with Session(db) as session:
@@ -136,6 +217,20 @@ class CheckActiveSubscriptions(Resource):
 
 class CheckFutureSubscriptions(Resource):
     """future subscriptions"""
+
+    @swagger.operation(
+        notes='Get your future subscriptions',
+        responseMessages=[
+            {
+                "code": 200,
+                "message": "[List of subscriptions]",
+            },
+            {
+                "code": 401,
+                "message": "Missing Authorization Header",
+            },
+        ],
+    )
     @jwt_required()
     def get(self):
         with Session(db) as session:
@@ -150,6 +245,41 @@ class CheckFutureSubscriptions(Resource):
 
 
 class SubscribeView(Resource):
+    @swagger.operation(
+        notes='Sign up for some subscription',
+        parameters=[
+            {
+                "name": "from_date",
+                "description": "your subscription start date",
+                "required": True,
+                "allowMultiple": False,
+                "dataType": date.__name__,
+                "paramType": "body",
+            },
+            {
+                "name": "to_date",
+                "description": "your subscription end date",
+                "required": True,
+                "allowMultiple": False,
+                "dataType": date.__name__,
+                "paramType": "body",
+            },
+        ],
+        responseMessages=[
+            {
+                "code": 200,
+                "message": "[Subscription]",
+            },
+            {
+                "code": 401,
+                "message": "Missing Authorization Header",
+            },
+            {
+                "code": 400,
+                "message": "[Errors]",
+            },
+        ],
+    )
     @jwt_required()
     def post(self, id):
         errors = UserSubscribeValidator().validate(request.json)
@@ -169,6 +299,19 @@ class SubscribeView(Resource):
 
         return SubscriptionWithLinkSchema().dump(Subscription.query.get(id))
 
+    @swagger.operation(
+        notes='Retrieve subscription',
+        responseMessages=[
+            {
+                "code": 200,
+                "message": "[Subscription]",
+            },
+            {
+                "code": 401,
+                "message": "Missing Authorization Header",
+            },
+        ],
+    )
     @jwt_required()
     def get(self, id):
         sub = Subscription.query.get(id)

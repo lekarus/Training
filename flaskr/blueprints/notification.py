@@ -1,10 +1,11 @@
 from database.models import Notification, NotificationType, Roles, User
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_restful import abort, reqparse, Resource
+from flask_restful_swagger import swagger
 from serializers.notifications import NotificationSerializer
 from utils import create_blueprint_with_api, ORMBaseClass
 
-notification, api = create_blueprint_with_api("notification")
+notification, api = create_blueprint_with_api("notification", "notification")
 
 
 class NotificationResource(Resource):
@@ -17,11 +18,95 @@ class NotificationResource(Resource):
         self.parser.add_argument('notif_body', type=str, location='json', required=True)
         super(Resource, self).__init__()
 
+    @swagger.operation(
+        notes='Get all notification',
+        responseMessages=[
+            {
+                "code": 200,
+                "message": "[List of notifications]",
+            },
+            {
+                "code": 401,
+                "message": "Missing Authorization Header",
+            },
+        ],
+    )
     @jwt_required()
     def get(self):
         notifications = Notification.query.filter_by(to_id=get_jwt_identity()).order_by(Notification.send_at).all()
         return NotificationSerializer(many=True).dump(notifications)
 
+    @swagger.operation(
+        notes='Send notification',
+        parameters=[
+            {
+                "name": "type",
+                "description": "notification type [to_all/direct/subscription]",
+                "required": True,
+                "allowMultiple": False,
+                "dataType": str.__name__,
+                "paramType": "body",
+            },
+            {
+                "name": "to_user",
+                "description": "user_id, if you send direct message",
+                "required": False,
+                "allowMultiple": False,
+                "dataType": int.__name__,
+                "paramType": "body",
+            },
+            {
+                "name": "subscription_id",
+                "description": "subscription_id, if you send subscription message",
+                "required": False,
+                "allowMultiple": False,
+                "dataType": int.__name__,
+                "paramType": "body",
+            },
+            {
+                "name": "notif_header",
+                "description": "Topic of your notification",
+                "required": True,
+                "allowMultiple": False,
+                "dataType": str.__name__,
+                "paramType": "body",
+            },
+            {
+                "name": "notif_body",
+                "description": "Your message",
+                "required": True,
+                "allowMultiple": False,
+                "dataType": str.__name__,
+                "paramType": "body",
+            },
+        ],
+        responseMessages=[
+            {
+                "code": 200,
+                "message": "",
+            },
+            {
+                "code": 401,
+                "message": "Missing Authorization Header",
+            },
+            {
+                "code": 403,
+                "message": "Have no access. Only Admins!",
+            },
+            {
+                "code": 400,
+                "message": "direct message must contain [to_user] param",
+            },
+            {
+                "code": 403,
+                "message": "Have no access. Only Trainers!",
+            },
+            {
+                "code": 400,
+                "message": "subscription message must contain [subscription_id] param",
+            },
+        ],
+    )
     @jwt_required()
     def post(self):
         args = self.parser.parse_args()
@@ -74,6 +159,23 @@ class NotificationResource(Resource):
 
 
 class NotificationResourceRetrieve(Resource):
+    @swagger.operation(
+        notes='Retrieve and read your notification',
+        responseMessages=[
+            {
+                "code": 200,
+                "message": "[Notification Object]",
+            },
+            {
+                "code": 400,
+                "message": "Bad Request. You don`t have access to this notification",
+            },
+            {
+                "code": 401,
+                "message": "Missing Authorization Header",
+            },
+        ],
+    )
     @jwt_required()
     def get(self, instance_id):
         instance = Notification.query.filter_by(id=instance_id, to_id=get_jwt_identity()).first()
@@ -85,13 +187,26 @@ class NotificationResourceRetrieve(Resource):
 
 
 class GetUnReadNotifications(Resource):
+    @swagger.operation(
+        notes='Get your unread notifications',
+        responseMessages=[
+            {
+                "code": 200,
+                "message": "[List of Notifications]",
+            },
+            {
+                "code": 401,
+                "message": "Missing Authorization Header",
+            },
+        ],
+    )
     @jwt_required()
     def get(self):
         instances = Notification.query.filter_by(to_id=get_jwt_identity(), is_read=False).order_by(Notification.send_at)
         return NotificationSerializer(many=True).dump(instances)
 
 
-api.add_resource(NotificationResource, "/notification")
-api.add_resource(NotificationResourceRetrieve, "/notification/<int:instance_id>")
+api.add_resource(NotificationResource, "/")
+api.add_resource(NotificationResourceRetrieve, "/<int:instance_id>")
 
 api.add_resource(GetUnReadNotifications, "/unread_notifications")
